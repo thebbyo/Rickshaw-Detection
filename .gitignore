@@ -1,0 +1,32 @@
+# Ignore Python cache and virtual environments
+__pycache__/
+venv/
+
+# Ignore all image files (common formats)
+*.jpg
+*.jpeg
+*.png
+*.bmp
+*.gif
+*.tiff
+*.tif
+*.webp
+
+# Ignore dataset and output folders
+rickshaw_labeled_images/
+yolo_dataset/
+runs/
+uploaded_images/
+
+# Ignore OS and editor files
+.DS_Store
+*.swp
+
+# Ignore model weights (if you want to upload them manually, remove this)
+yolov8n.pt
+
+# Allow README and code files
+!*.py
+!*.md
+!*.html
+!requirements.txt

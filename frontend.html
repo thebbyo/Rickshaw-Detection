@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rickshaw Detection UI</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f7f7f7; margin: 0; padding: 0; }
+        .container { max-width: 520px; margin: 40px auto; background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); padding: 32px; }
+        h2 { text-align: center; margin-bottom: 24px; }
+        .upload-box { border: 2px dashed #888; border-radius: 8px; padding: 24px; text-align: center; background: #fafafa; margin-bottom: 24px; }
+        input[type="file"] { display: none; }
+        label[for="file-upload"] { color: #1976d2; cursor: pointer; font-weight: bold; }
+        .btn { background: #1976d2; color: #fff; border: none; padding: 12px 24px; border-radius: 4px; font-size: 16px; cursor: pointer; margin-top: 12px; }
+        .btn:disabled { background: #aaa; }
+        .result-img { display: block; margin: 24px auto 0 auto; max-width: 100%; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.12); }
+        .detections { margin-top: 24px; }
+        .detections ul { padding-left: 20px; }
+        .detections li { margin-bottom: 8px; }
+        .loading { color: #1976d2; font-weight: bold; text-align: center; margin-top: 18px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Rickshaw Detection</h2>
+        <form id="upload-form">
+            <div class="upload-box">
+                <label for="file-upload">Choose an image to detect rickshaw(s)</label><br>
+                <input id="file-upload" type="file" accept="image/*" required />
+            </div>
+            <button class="btn" type="submit">Detect</button>
+        </form>
+        <div id="loading" class="loading" style="display:none;">Detecting...</div>
+        <div id="result" style="display:none;">
+            <img id="result-img" class="result-img" src="" alt="Detection Result" />
+            <div class="detections">
+                <h3>Detections:</h3>
+                <ul id="detections-list"></ul>
+            </div>
+        </div>
+    </div>
+    <script>
+        const form = document.getElementById('upload-form');
+        const fileInput = document.getElementById('file-upload');
+        const loadingDiv = document.getElementById('loading');
+        const resultDiv = document.getElementById('result');
+        const resultImg = document.getElementById('result-img');
+        const detectionsList = document.getElementById('detections-list');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!fileInput.files[0]) return;
+            loadingDiv.style.display = 'block';
+            resultDiv.style.display = 'none';
+            detectionsList.innerHTML = '';
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            try {
+                const response = await fetch('/detect', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                loadingDiv.style.display = 'none';
+                if (data.image_url) {
+                    resultImg.src = data.image_url;
+                    resultDiv.style.display = 'block';
+                } else {
+                    resultDiv.style.display = 'none';
+                }
+                if (data.results && data.results.length > 0) {
+                    data.results.forEach((det, idx) => {
+                        const li = document.createElement('li');
+                        li.textContent = `${idx+1}. ${det.class_name} (Confidence: ${(det.confidence*100).toFixed(1)}%) [${det.bbox.join(', ')}]`;
+                        detectionsList.appendChild(li);
+                    });
+                } else {
+                    detectionsList.innerHTML = '<li>No rickshaw detected.</li>';
+                }
+            } catch (err) {
+                loadingDiv.style.display = 'none';
+                alert('Detection failed. Please try again.');
+            }
+        });
+    </script>
+</body>
+</html>
