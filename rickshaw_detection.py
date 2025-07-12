@@ -11,7 +11,7 @@ from PIL import Image
 from ultralytics import YOLO
 
 class RickshawDetector:
-    def __init__(self, data_dir='/Users/dibbyoroy/Desktop/ML project/rickshaw_detection'):
+    def __init__(self, data_dir='/Users/dibbyoroy/Desktop/ML project/rickshaw_detection/Rickshaw-Detection'):
         self.data_dir = data_dir
         self.labeled_images_dir = os.path.join(data_dir, 'rickshaw_labeled_images')
         self.yolo_dir = os.path.join(data_dir, 'yolo_dataset')
@@ -213,7 +213,7 @@ class RickshawDetector:
         
         return img, detections
     
-    def visualize_detection(self, image_path, conf_threshold=0.05, save_path=None):
+    def visualize_detection(self, image_path, conf_threshold=0.03,save_path=None):
         """
         Visualize rickshaw detection results
         
@@ -253,35 +253,32 @@ def main():
     # Initialize the rickshaw detector
     detector = RickshawDetector()
 
-    # Path to the trained model
-    model_path = os.path.join(detector.data_dir, 'runs', 'rickshaw_detection', 'weights', 'best.pt')
-
-    if os.path.exists(model_path):
-        print("Trained model found. Skipping dataset preparation and training.")
-        detector.load_model(model_path)
-        # Evaluate the model
+    # Force full pipeline: dataset preparation, training, and evaluation
+    print("Running full pipeline: dataset preparation, training, and evaluation.")
+    
+    # Prepare the dataset
+    train_ratio = 0.9
+    detector.prepare_dataset(train_ratio=train_ratio)
+    print(f"Dataset split: Train ({train_ratio*100:.2f}%), Validation ({(1-train_ratio)*100:.2f}%)")
+    
+    # Train the model
+    epochs = 50
+    batch_size = 8
+    detector.train_model(epochs=epochs, batch_size=batch_size)
+    
+    # Evaluate the model
+    try:
         eval_results = detector.evaluate_model()
         print(f"Evaluation results: {eval_results}")
-    else:
-        print("No trained model found. Running full pipeline: dataset preparation, training, and evaluation.")
-        # Prepare the dataset
-        train_ratio = 0.9
-        detector.prepare_dataset(train_ratio=train_ratio)
-        print(f"Dataset split: Train ({train_ratio*100:.2f}%), Validation ({(1-train_ratio)*100:.2f}%)")
-        # Train the model
-        epochs = 50
-        batch_size = 8
-        detector.train_model(epochs=epochs, batch_size=batch_size)
-        # Evaluate the model
-        eval_results = detector.evaluate_model()
-        print(f"Evaluation results: {eval_results}")
+    except Exception as e:
+        print(f"Evaluation error: {e}")
 
     # Example usage
-    test_image = '/Users/dibbyoroy/Desktop/ML project/rickshaw_detection/rickshaw_labeled_images/images/0d5f5251-849F7B9A-BA6A-40CB-A10C-A213F2DC38D0.jpg'
+    test_image = '/Users/dibbyoroy/Desktop/ML project/rickshaw_detection/Rickshaw-Detection/rickshaw_labeled_images/images/0d5f5251-849F7B9A-BA6A-40CB-A10C-A213F2DC38D0.jpg'
     if os.path.exists(test_image):
         # Save the detection visualization to a file
         output_path = os.path.join(os.path.dirname(test_image), 'detection_result.jpg')
-        detections = detector.visualize_detection(test_image, save_path=output_path)
+        detections = detector.visualize_detection(test_image, conf_threshold=0.30,save_path=output_path)
         # Print detection results
         print(f"\nDetection Results:")
         for i, det in enumerate(detections):

@@ -5,32 +5,253 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rickshaw Detection UI</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #f7f7f7; margin: 0; padding: 0; }
-        .container { max-width: 520px; margin: 40px auto; background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); padding: 32px; }
-        h2 { text-align: center; margin-bottom: 24px; }
-        .upload-box { border: 2px dashed #888; border-radius: 8px; padding: 24px; text-align: center; background: #fafafa; margin-bottom: 24px; }
-        input[type="file"] { display: none; }
-        label[for="file-upload"] { color: #1976d2; cursor: pointer; font-weight: bold; }
-        .btn { background: #1976d2; color: #fff; border: none; padding: 12px 24px; border-radius: 4px; font-size: 16px; cursor: pointer; margin-top: 12px; }
-        .btn:disabled { background: #aaa; }
-        .result-img { display: block; margin: 24px auto 0 auto; max-width: 100%; border-radius: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.12); }
-        .detections { margin-top: 24px; }
-        .detections ul { padding-left: 20px; }
-        .detections li { margin-bottom: 8px; }
-        .loading { color: #1976d2; font-weight: bold; text-align: center; margin-top: 18px; }
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #f97316;
+            --light: #f8fafc;
+            --dark: #1e293b;
+            --success: #10b981;
+            --error: #ef4444;
+        }
+        
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); 
+            margin: 0; 
+            padding: 0; 
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container { 
+            width: 100%;
+            max-width: 580px; 
+            margin: 40px auto; 
+            background: #fff; 
+            border-radius: 16px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08); 
+            padding: 32px; 
+            transition: all 0.3s ease;
+        }
+        
+        h2 { 
+            text-align: center; 
+            margin-bottom: 24px; 
+            color: var(--dark);
+            font-weight: 600;
+            position: relative;
+            padding-bottom: 12px;
+        }
+        
+        h2:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+        
+        .upload-box { 
+            border: 2px dashed #cbd5e1; 
+            border-radius: 12px; 
+            padding: 32px; 
+            text-align: center; 
+            background: #f8fafc; 
+            margin-bottom: 24px; 
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .upload-box:hover {
+            border-color: var(--primary);
+            background: #f0f9ff;
+            transform: translateY(-2px);
+        }
+        
+        .upload-box.has-file {
+            border-color: var(--success);
+            background: #ecfdf5;
+        }
+        
+        input[type="file"] { 
+            display: none; 
+        }
+        
+        label[for="file-upload"] { 
+            color: var(--primary); 
+            cursor: pointer; 
+            font-weight: 500; 
+            transition: all 0.2s ease;
+            display: inline-block;
+            margin-bottom: 8px;
+        }
+        
+        label[for="file-upload"]:hover { 
+            color: var(--primary-dark);
+            transform: scale(1.03);
+        }
+        
+        .file-info {
+            margin-top: 16px;
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .file-name {
+            font-weight: 500;
+            color: var(--success);
+            margin-bottom: 8px;
+        }
+        
+        .btn { 
+            background: var(--primary); 
+            color: #fff; 
+            border: none; 
+            padding: 12px 28px; 
+            border-radius: 8px; 
+            font-size: 16px; 
+            font-weight: 500;
+            cursor: pointer; 
+            margin: 0 auto;
+            display: block;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn:hover { 
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn:disabled { 
+            background: #94a3b8; 
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .result-img { 
+            display: block; 
+            margin: 24px auto 0 auto; 
+            max-width: 100%; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
+            transition: all 0.3s ease;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .result-img:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.12);
+        }
+        
+        .detections { 
+            margin-top: 28px; 
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .detections h3 {
+            color: var(--dark);
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+        
+        .detections ul { 
+            padding-left: 20px; 
+        }
+        
+        .detections li { 
+            margin-bottom: 12px; 
+            padding: 8px 12px;
+            background: #f8fafc;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+        
+        .detections li:hover {
+            background: #f0f9ff;
+            transform: translateX(4px);
+        }
+        
+        .loading-container {
+            display: none;
+            text-align: center;
+            margin: 32px 0;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .loading-spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid rgba(37, 99, 235, 0.2);
+            border-left-color: var(--primary);
+            border-radius: 50%;
+            display: inline-block;
+            animation: spin 1s linear infinite;
+        }
+        
+        .loading-text {
+            color: var(--primary);
+            font-weight: 500;
+            margin-top: 16px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h2>Rickshaw Detection</h2>
         <form id="upload-form">
-            <div class="upload-box">
-                <label for="file-upload">Choose an image to detect rickshaw(s)</label><br>
+            <div id="upload-box" class="upload-box">
+                <label for="file-upload" id="upload-label">Choose an image to detect rickshaw(s)</label><br>
                 <input id="file-upload" type="file" accept="image/*" required />
+                <div class="file-info" id="file-info">
+                    <div class="file-name" id="file-name"></div>
+                    <div>Image uploaded successfully! Click "Detect" to analyze.</div>
+                </div>
             </div>
-            <button class="btn" type="submit">Detect</button>
+            <button id="detect-btn" class="btn" type="submit">Detect</button>
         </form>
-        <div id="loading" class="loading" style="display:none;">Detecting...</div>
+        
+        <div id="loading-container" class="loading-container">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">Analyzing image...</div>
+        </div>
+        
         <div id="result" style="display:none;">
             <img id="result-img" class="result-img" src="" alt="Detection Result" />
             <div class="detections">
@@ -42,32 +263,66 @@
     <script>
         const form = document.getElementById('upload-form');
         const fileInput = document.getElementById('file-upload');
-        const loadingDiv = document.getElementById('loading');
+        const uploadBox = document.getElementById('upload-box');
+        const uploadLabel = document.getElementById('upload-label');
+        const fileInfo = document.getElementById('file-info');
+        const fileName = document.getElementById('file-name');
+        const detectBtn = document.getElementById('detect-btn');
+        const loadingContainer = document.getElementById('loading-container');
         const resultDiv = document.getElementById('result');
         const resultImg = document.getElementById('result-img');
         const detectionsList = document.getElementById('detections-list');
 
+        // Handle file selection
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files[0]) {
+                uploadBox.classList.add('has-file');
+                fileName.textContent = fileInput.files[0].name;
+                fileInfo.style.display = 'block';
+                uploadLabel.textContent = 'Change image';
+                detectBtn.classList.add('pulse');
+            } else {
+                uploadBox.classList.remove('has-file');
+                fileInfo.style.display = 'none';
+                uploadLabel.textContent = 'Choose an image to detect rickshaw(s)';
+                detectBtn.classList.remove('pulse');
+            }
+        });
+
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!fileInput.files[0]) return;
-            loadingDiv.style.display = 'block';
+            
+            // Show loading animation
+            loadingContainer.style.display = 'block';
             resultDiv.style.display = 'none';
+            detectBtn.disabled = true;
+            detectBtn.textContent = 'Detecting...';
+            detectBtn.classList.remove('pulse');
+            
             detectionsList.innerHTML = '';
             const formData = new FormData();
             formData.append('file', fileInput.files[0]);
+            
             try {
                 const response = await fetch('/detect', {
                     method: 'POST',
                     body: formData
                 });
                 const data = await response.json();
-                loadingDiv.style.display = 'none';
+                
+                // Hide loading animation
+                loadingContainer.style.display = 'none';
+                detectBtn.disabled = false;
+                detectBtn.textContent = 'Detect';
+                
                 if (data.image_url) {
                     resultImg.src = data.image_url;
                     resultDiv.style.display = 'block';
                 } else {
                     resultDiv.style.display = 'none';
                 }
+                
                 if (data.results && data.results.length > 0) {
                     data.results.forEach((det, idx) => {
                         const li = document.createElement('li');
@@ -78,7 +333,9 @@
                     detectionsList.innerHTML = '<li>No rickshaw detected.</li>';
                 }
             } catch (err) {
-                loadingDiv.style.display = 'none';
+                loadingContainer.style.display = 'none';
+                detectBtn.disabled = false;
+                detectBtn.textContent = 'Detect';
                 alert('Detection failed. Please try again.');
             }
         });

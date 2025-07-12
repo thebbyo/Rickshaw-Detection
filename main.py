@@ -24,7 +24,7 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 
 detector = RickshawDetector()
-model_path = os.path.join(detector.data_dir, 'runs', 'rickshaw_detection', 'weights', 'best.pt')
+model_path = os.path.join(detector.data_dir, 'runs', 'rickshaw_detection5', 'weights', 'best.pt')
 if os.path.exists(model_path):
     detector.load_model(model_path)
 else:
@@ -51,7 +51,7 @@ async def detect_rickshaw(file: UploadFile = File(...)):
         # Run detection
         result_filename = f"result_{filename}"
         output_path = os.path.join(UPLOAD_DIR, result_filename)
-        detections = detector.visualize_detection(file_path, save_path=output_path)
+        detections = detector.visualize_detection(file_path, save_path=output_path, conf_threshold=0.2)
         results = [
             DetectionResult(
                 class_name=det["class"],
