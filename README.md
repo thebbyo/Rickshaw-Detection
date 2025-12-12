@@ -46,6 +46,12 @@ These challenges are handled through **dataset curation**, **annotation strategy
 ## Setup
 
 1. Install the required dependencies:
+   pip install -r requirements.txt
+
+3. Dataset structure:
+   - The system uses labeled images from the rickshaw_labeled_images folder
+   - Images are stored in the rickshaw_labeled_images/images directory
+   - Labels are stored in the rickshaw_labeled_images/labels directory in YOLO format
 
 ```bash
 pip install -r requirements.txt
