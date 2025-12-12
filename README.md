@@ -36,9 +36,9 @@ These challenges are handled through **dataset curation**, **annotation strategy
 ## 🖼️ Sample Results
 
 <p align="center">
-  <img src="assest/a.png" width="30%" />
-  <img src="assest/b.png" width="30%" />
-  <img src="assest/c.png" width="30%" />
+  <img src="a.png" width="30%" />
+  <img src="b.png" width="30%" />
+  <img src="c.png" width="30%" />
 </p>
 
 ---
