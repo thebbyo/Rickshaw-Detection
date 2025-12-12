@@ -36,22 +36,18 @@ These challenges are handled through **dataset curation**, **annotation strategy
 ## 🖼️ Sample Results
 
 <p align="center">
-  <img src="assest/sample1.png" width="30%" />
-  <img src="assest/sample2.png" width="30%" />
-  <img src="assest/sample3.png" width="30%" />
+  <img src="assest/a.png" width="30%" />
+  <img src="assest/b.png" width="30%" />
+  <img src="assest/c.png" width="30%" />
 </p>
 
 ---
 
 ## Setup
 
-1. Install the required dependencies:
+1. **Install the required dependencies**:
+
+   Make sure you have Python 3.8+ installed, then use `pip` to install the required dependencies from the `requirements.txt` file:
+
+   ```bash
    pip install -r requirements.txt
-
-3. Dataset structure:
-   - The system uses labeled images from the rickshaw_labeled_images folder
-   - Images are stored in the rickshaw_labeled_images/images directory
-   - Labels are stored in the rickshaw_labeled_images/labels directory in YOLO format
-
-```bash
-pip install -r requirements.txt
